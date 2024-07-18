@@ -5,10 +5,14 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './StudentApp.css';
+import { useNavigate } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const StudentApp = () => {
   const { students } = useStudentState();
   const dispatch = useStudentDispatch();
+  const navigate = useNavigate();
   const [editId, setEditId] = useState(null);
   const [editFirstName, setEditFirstName] = useState('');
   const [editLastName, setEditLastName] = useState('');
@@ -46,8 +50,10 @@ const StudentApp = () => {
 
     if (isEditing) {
       dispatch({ type: 'UPDATE_STUDENT', payload: updatedStudent });
+      toast.success('Student muvaffaqiyatli yuklandi');
     } else {
       dispatch({ type: 'ADD_STUDENT', payload: updatedStudent });
+      toast.success('Student muvaffaqiyatli qushildi');
     }
 
     setEditId(null);
@@ -67,6 +73,12 @@ const StudentApp = () => {
 
   const handleDelete = (id) => {
     dispatch({ type: 'DELETE_STUDENT', payload: id });
+    toast.success(`Student muvaffaqiyatli yo'q qilindi`);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('authToken'); 
+    navigate('/login'); 
   };
 
   const filteredStudents = students.filter(
@@ -80,30 +92,30 @@ const StudentApp = () => {
   return (
     <div className="App">
       <h1 className="text-center">Student List</h1>
+      <Button variant="danger" onClick={handleLogout} style={{ marginBottom: '20px'   }}>Logout</Button>
       <div className='biggest'>
-      <div className="search-bar">
-        <Form.Control
-        className='searches'
-          type="text"
-          placeholder="Search by first name, last name or group"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </div>
-      <div className="filter-group">
-        <Form.Control
-          as="select"
-          value={filterGroup}
-          onChange={(e) => setFilterGroup(e.target.value)}
-        >
-          <option value="">All Groups</option>
-          {Array.from(new Set(students.map(student => student.group))).map(group => (
-            <option key={group} value={group}>{group}</option>
-          ))}
-        </Form.Control>
-      </div>
-      <Button variant="success" onClick={handleAdd} style={{ marginBottom: '20px' }}>Add Student</Button>
-
+        <div className="search-bar">
+          <Form.Control
+            className='searches'
+            type="text"
+            placeholder="Search by first name"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        <div className="filter-group">
+          <Form.Control
+            as="select"
+            value={filterGroup}
+            onChange={(e) => setFilterGroup(e.target.value)}
+          >
+            <option value="">All Groups</option>
+            {Array.from(new Set(students.map(student => student.group))).map(group => (
+              <option key={group} value={group}>{group}</option>
+            ))}
+          </Form.Control>
+        </div>
+        <Button variant="success" onClick={handleAdd} style={{ marginBottom: '20px' }}>Add Student</Button>
       </div>
       <table className="tabless table table-striped table-bordered table-hover table-responsive-sm">
         <thead>
@@ -176,6 +188,7 @@ const StudentApp = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+      <ToastContainer />
     </div>
   );
 };

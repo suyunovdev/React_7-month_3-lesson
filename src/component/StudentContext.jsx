@@ -40,13 +40,20 @@ export const StudentProvider = ({ children }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/student');
+        const response = await axios.get('http://localhost:4000/students');
         console.log('Fetched data:', response.data);
         dispatch({ type: 'SET_STUDENTS', payload: response.data });
       } catch (error) {
-        console.error('Error fetching data:', error);
-        console.log('Axios config:', error.config);
-        console.log('Axios request:', error.request);
+        console.error('Error fetching data:', error.message);
+        console.error('Error details:', {
+          config: error.config,
+          request: error.request,
+          response: error.response ? {
+            data: error.response.data,
+            status: error.response.status,
+            headers: error.response.headers
+          } : null
+        });
       }
     };
 
